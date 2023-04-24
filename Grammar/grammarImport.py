@@ -3,9 +3,10 @@ import Utils.constants as constant
 from Automata.state import State
 from Automata.transition import Transition
 
-def importGrammar (File):
-    file = open(File,'r')
-    data = file.readlines()
+def importGrammar (input):
+
+    data = input.splitlines()
+    print(data)
     
     transitions = []
     initStateSym = data[0].rstrip()

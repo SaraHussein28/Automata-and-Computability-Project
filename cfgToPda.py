@@ -12,7 +12,7 @@ class Automaton:
 
     def toPda(self):
         trFunc = {}
-        print("Transitions:")
+        res = "Transitions:"
         for t in self.transitions:
             key = (t.currState, t.inputSymbol, t.popSymbol)
             # make a new key in transition function if not found
@@ -21,15 +21,21 @@ class Automaton:
             trFunc[key].append((t.nextState, t.pushSymbols))
         trFunc = enumerate(trFunc.items())
         for i, (key, value) in trFunc:
-            print(constant.DELTA + '(' + str(key[0]) + ',' 
-            + key[1] + ',' + key[2] + ') = {', end="")
+            res += '\n'
+            res += str(constant.DELTA) + '(' + str(key[0]) + ',' +str (key[1]) + ',' + str(key[2]) + ') = { '
+
+            # print(constant.DELTA + '(' + str(key[0]) + ',' 
+            # + key[1] + ',' + key[2] + ') = {', end="")
             targets = []
             for val in value:
                 pushStr = ''.join(val[1])
                 targets.append(
                     '(' + str(val[0]) + ',' + pushStr + ')'
                 )
-            print(str(', ').join(targets) + ' }')
+            res += str(', ').join(targets) + ' }'
+            # print(str(', ').join(targets) + ' }')
+        
+        return res
         
     # not needed 
     def checkMembership(self, string):

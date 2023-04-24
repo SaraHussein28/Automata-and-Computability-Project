@@ -1,10 +1,11 @@
 import Utils.constants as constant
 from .state import State
 
+
 class Transition:
     inputSymbol = ''
-    currState = ''
-    nextState = ''
+    currState = None
+    nextState = None
     popSymbol = ''
     pushSymbols = []
     
@@ -20,6 +21,6 @@ class Transition:
     
     def __str__(self):
         pushString = ''.join(self.pushSymbols)
-        string = self.inputSymbol + ", " + self.popSymbol + ", " + pushString 
+        string = self.inputSymbol + ", " + self.popSymbol + " -> " + pushString 
         return string
         
