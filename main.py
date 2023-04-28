@@ -1,6 +1,13 @@
-from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QWidget, QTableWidget, QTableWidgetItem, QHBoxLayout, QVBoxLayout
+from tkinter import *
+from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QWidget, QHBoxLayout, QVBoxLayout
 import Grammar.grammarImport as Grammar
 from cfgToPda import Automaton
+import matplotlib.pyplot as plt
+import graphviz
+
+G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
+G.attr(rankdir='LR', size='8,5')
+
 
 def submit():
     input = text_edit.toPlainText()
@@ -9,8 +16,18 @@ def submit():
     res = pda.toPda()
     print (res)
     show_pda(res=res)
-    graph_list = generate_graph(transitions=transitions)
+    generate_graph(transitions=transitions)
+    draw()
     grammar_status_label.setText("submitted")   
+
+
+
+def draw():
+    print (G)
+
+    plt.show()
+
+
 
 
 def show_pda(res):
@@ -19,16 +36,23 @@ def show_pda(res):
 
 def generate_graph(transitions):
     graph_list = dict()
-
+    G.node('Q0')
+    G.node('Q1')
+    G.node('Q2')
     for transition in transitions:
 
         src, dst = transition.currState.__str__(), transition.nextState.__str__()
         print (src , "   ", dst)
+        G.edge(src, dst, label=transition.__str__())
+        #G.add_edge(src, dst, w=transition.__str__(),color = "black")
         if (src,dst) not in graph_list:
             graph_list[(src,dst)] = list()
         graph_list[(src,dst)].append(transition.__str__())
     
     print(graph_list)
+    G.edge('Q1', 'Q2', label="heeloo")
+    G.view()
+    
     return graph_list
 
 
@@ -39,8 +63,6 @@ def generate_graph(transitions):
             
 
         
-
-
 
 
 app = QApplication([])
@@ -87,3 +109,10 @@ main_widget.setLayout(grid)
 main_widget.show()
 
 app.exec()
+
+
+# fig = plt.figure()
+# canvas = FigureCanvasTkAgg(fig, GraphInputPage)
+# canvas.draw()
+# canvas.get_tk_widget().pack(side=RIGHT, fill=Y)
+# GraphInputPage.mainloop()
