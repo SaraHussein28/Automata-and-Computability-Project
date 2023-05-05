@@ -3,3 +3,21 @@ a,b
 S->aSX|bSY|b
 X->b
 Y->a
+
+S
+a,b
+S->aSbb|a
+
+S
+a,b,c
+S -> aA
+A -> aABc|BB|a
+B -> b
+
+
+Check if this is CGF asasann:
+
+S
+a,b
+S->aSb|A  
+A->bAa|S|λ

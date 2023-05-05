@@ -95,7 +95,7 @@ class Automaton:
 
 if __name__ == "__main__":
     path = input("Path for grammar: ").strip()
-    states, transitions = Grammar.importGrammar(path)
+    states, transitions, productions = Grammar.importGrammar(path)
     
     pda = Automaton(states, transitions)
     pda.toPda()
@@ -109,4 +109,4 @@ if __name__ == "__main__":
         if isMember:
             print("String " + string + " is part of the language.")
         else:
-            print("String " + string + " is not in the language.")
+            print("String " + string + " is not in the language.") 

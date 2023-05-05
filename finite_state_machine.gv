@@ -4,11 +4,13 @@ digraph finite_state_machine {
 	Q0
 	Q1
 	Q2
-	Q1 -> Q1 [label="a, S -> SX"]
-	Q1 -> Q1 [label="b, S -> SY"]
-	Q1 -> Q1 [label="b, S -> λ"]
-	Q1 -> Q1 [label="b, X -> λ"]
-	Q1 -> Q1 [label="a, Y -> λ"]
+	Q1 -> Q1 [label="a, S -> A"]
+	Q1 -> Q1 [label="a, A -> AF"]
+	Q1 -> Q1 [label="b, A -> B"]
+	Q1 -> Q1 [label="a, A -> λ"]
+	Q1 -> Q1 [label="b, B -> λ"]
+	Q1 -> Q1 [label="c, D -> λ"]
+	Q1 -> Q1 [label="b, F -> D"]
 	Q0 -> Q1 [label="λ, ε -> Sε"]
 	Q1 -> Q2 [label="λ, ε -> ε"]
 	Q1 -> Q2 [label=heeloo]

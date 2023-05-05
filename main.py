@@ -5,13 +5,18 @@ from cfgToPda import Automaton
 import matplotlib.pyplot as plt
 import graphviz
 
+from convertToGNF import convertToGNF
+
 G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
 G.attr(rankdir='LR', size='8,5')
 
 
 def submit():
     input = text_edit.toPlainText()
-    states, transitions = Grammar.importGrammar(input)
+    productions = Grammar.importGrammar(input)
+    gnf = convertToGNF(productions)
+    print (gnf)
+    states, transitions = Grammar.generate_states_and_transitions(gnf)
     pda = Automaton(states, transitions)
     res = pda.toPda()
     print (res)
@@ -50,7 +55,6 @@ def generate_graph(transitions):
         graph_list[(src,dst)].append(transition.__str__())
     
     print(graph_list)
-    G.edge('Q1', 'Q2', label="heeloo")
     G.view()
     
     return graph_list
