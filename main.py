@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import graphviz
 
 from convertToGNF import convertToGNF
+from convertToGNF import generate_gnf_grammar
 
 G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
 G.attr(rankdir='LR', size='8,5')
@@ -14,6 +15,7 @@ G.attr(rankdir='LR', size='8,5')
 def submit():
     input = text_edit.toPlainText()
     productions = Grammar.importGrammar(input)
+  
     gnf = convertToGNF(productions)
     print (gnf)
     states, transitions = Grammar.generate_states_and_transitions(gnf)
@@ -21,6 +23,9 @@ def submit():
     res = pda.toPda()
     print (res)
     show_pda(res=res)
+
+    res = generate_gnf_grammar(productions)
+    show_gnf(gnf=res)
     generate_graph(transitions=transitions)
     draw()
     grammar_status_label.setText("submitted")   
@@ -38,6 +43,8 @@ def draw():
 def show_pda(res):
     pda_grammar.setPlainText(res)
     
+def show_gnf(gnf):
+    gnf_grammar.setPlainText(gnf)
 
 def generate_graph(transitions):
     graph_list = dict()
@@ -74,30 +81,39 @@ main_widget = QWidget()
 
 text_edit = QTextEdit()
 text_edit.setTabStopWidth(15)
-input_label = QLabel('Enter Context Free Grammar below !')
+input_label = QLabel('Enter Context Free Grammar below!')
 
 grammar_status_label = QLabel("Status: Waiting...")
 submit_button = QPushButton('Submit')
 submit_button.clicked.connect(submit)
 
 
+gnf_grammar = QTextEdit()
+gnf_grammar.setTabStopWidth(15)
+gnf_grammar.setReadOnly(True)
 
 pda_grammar = QTextEdit()
 pda_grammar.setTabStopWidth(15)
 pda_grammar.setReadOnly(True)
+
+gnf_label = QLabel('GNF')
 pda_label = QLabel('PDA grammar')
+
 
 
 grid = QVBoxLayout()
 
 labels_subgrid = QHBoxLayout()
 labels_subgrid.addWidget(input_label)
+labels_subgrid.addWidget(gnf_label)
 labels_subgrid.addWidget(pda_label)
 
 
 subgrid = QHBoxLayout()
 subgrid.addWidget(text_edit)
+subgrid.addWidget(gnf_grammar)
 subgrid.addWidget(pda_grammar)
+
 
 grid.addLayout(labels_subgrid)
 grid.addLayout((subgrid))

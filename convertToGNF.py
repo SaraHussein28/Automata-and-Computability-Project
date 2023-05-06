@@ -1,6 +1,36 @@
 import string
 import Utils.constants as constant
 
+def generate_gnf_grammar(grammar):
+    res = ""
+    terminals = ""
+    transtions = ""
+    first = True
+
+    for key in grammar:
+        for production in grammar[key]:
+            
+            for pr in production:
+                if pr.islower() and pr not in terminals:
+                    terminals+=pr + ','
+
+    res = 'S' +'\n' + terminals +'\n'
+    
+    for key in grammar:
+        for production in grammar[key]:
+            
+            if not first:
+                transtions+= '|' + production
+            else:
+                transtions+= key + ' -> ' + production
+                first = False
+        first = True
+
+
+        transtions +='\n'
+    res+= transtions
+    return res
+
 
 def convertToGNF(productions):
     print ("Removing Lamda")
