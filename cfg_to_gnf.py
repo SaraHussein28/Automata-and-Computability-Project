@@ -1,57 +1,21 @@
 import string
 import Utils.constants as constant
 
-def generate_gnf_grammar(grammar):
-    res = ""
-    terminals = ""
-    transtions = ""
-    first = True
-
-    for key in grammar:
-        for production in grammar[key]:
-            
-            for pr in production:
-                if pr.islower() and pr not in terminals:
-                    terminals+=pr + ','
-
-    res = 'S' +'\n' + terminals +'\n'
-    
-    for key in grammar:
-        for production in grammar[key]:
-            
-            if not first:
-                transtions+= '|' + production
-            else:
-                transtions+= key + ' -> ' + production
-                first = False
-        first = True
-
-
-        transtions +='\n'
-    res+= transtions
-    return res
-
 
 def convertToGNF(productions):
     print ("Removing Lamda")
-    checkEmpty2(productions)
-    #checkEmpty(productions, "S")
+    remove_lamda_productions(productions)
     print (productions)
 
-    # deleteEmptySymbols(productions)
-    # print(productions)
-
-    remove(grammar=productions)
+    remove_empty_symbols_and_productions(grammar=productions)
     print(productions)
 
     print("removing unit productions")
-    removeRenaiming(productions)
+    remove_unit_productions(productions)
     print(productions)
 
-
-    #addStartingState(productions)
     print ("Removing Non accessible")
-    productions = removeNonAccesible(productions)
+    productions = remove_non_accessible(productions)
     print(productions)
 
     print ("Removing Non productive")
@@ -61,9 +25,8 @@ def convertToGNF(productions):
     normalizeToChomsky(productions)
     normalizeToGreibach(productions)
 
-    #addStartingState(productions)
     print ("Removing Non accessible")
-    productions = removeNonAccesible(productions)
+    productions = remove_non_accessible(productions)
     print(productions)
 
     print ("Removing Non productive")
@@ -256,7 +219,7 @@ def divideNonTerminals(grammar, dictionaryOfReplaces, alphabet):
 
 
 
-def removeRenaiming(grammar):
+def remove_unit_productions(grammar):
     unitProductions = getUnitProductions(grammar)
     print("Unit Productions = ", unitProductions)
     for key in unitProductions:
@@ -311,7 +274,7 @@ def checkAccesible(productions, start, accessible):
 
     return accessible
 
-def removeNonAccesible(productions):
+def remove_non_accessible(productions):
     accesible = ["S"]
     accesible = checkAccesible(productions, "S", accesible)
     
@@ -321,21 +284,6 @@ def removeNonAccesible(productions):
     for key in nonAccesible:
         productions.pop(key)
     
-    return productions
-
-# Function to that adds a starting state - NE3MELHA BA3DEEN
-def addStartingState(productions, S):
-
-    to_add_S0 = False
-    for i in range(len(productions)):
-        if productions[i][0] == S:
-            to_add_S0 = True
-    if to_add_S0:
-        productions.append(('S0', S))
-        S = 'S0'
-
-    productions = [pair for pair in productions if pair[1] != 'epsilon']
-
     return productions
 
 def getNonProductiveSymbols(grammar):
@@ -389,7 +337,7 @@ def removeNonProductive(grammar):
 
 '''
 
-def remove(grammar):
+def remove_empty_symbols_and_productions(grammar):
     deleted = True
 
     while deleted:
@@ -414,43 +362,12 @@ def remove(grammar):
             deleted = True
 vis = set()
 
-def checkEmpty2(grammar):
+def remove_lamda_productions(grammar):
     for key in grammar:
         for production in grammar[key]:
             if production == constant.LAMBDA:
                 grammar[key].remove(production)
 
-def checkEmpty(grammar, key):
-
-    #vis.add(key)
-    
-    for i, production in enumerate(grammar[key]):
-        if production == constant.LAMBDA:
-            grammar[key].remove(production)
-            if len(grammar[key]) == 0:
-                return True
-        else:
-            for char in production:
-                if char.isupper() and char != key:# and char not in vis:
-
-                    if checkEmpty(grammar, char) == True:
-                        grammar[key][i] = production.replace(char,"")
-            if len(grammar[key][i]) == 0:
-                grammar[key].remove(grammar[key][i])
-    
-    if (len(grammar[key]) == 0):
-        return True
-    
-    return False
-
-def deleteEmptySymbols(grammar):
-    toBeDeleted = []
-    for symbol in grammar:
-        if len(grammar[symbol]) == 0:
-            toBeDeleted.append(symbol)
-    
-    for s in toBeDeleted:
-        grammar.pop(s)
 
 if __name__ == "__main__":
     convertToGNF({

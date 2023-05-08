@@ -12,15 +12,6 @@ class State:
         self.isFinal = isFinal
         self.transitions = transitions
     
-    def addTransition(self, transition):
-        self.transitions.add(transition)
-    
-    def setFinal (self, isFinal):
-        self.isFinal = isFinal
-    
-    def setInitial (self, isInitial):
-        self.isInitial = isInitial
-    
     def __str__(self):
         string = self.name 
         return string

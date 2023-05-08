@@ -1,12 +1,11 @@
 from tkinter import *
 from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QWidget, QHBoxLayout, QVBoxLayout
-import Grammar.grammarImport as Grammar
-from cfgToPda import Automaton
+import IO as Grammar
 import matplotlib.pyplot as plt
 import graphviz
 
-from convertToGNF import convertToGNF
-from convertToGNF import generate_gnf_grammar
+from cfg_to_gnf import convertToGNF
+from gnf_to_pda import convert_to_PDA
 
 G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
 G.attr(rankdir='LR', size='8,5')
@@ -14,29 +13,23 @@ G.attr(rankdir='LR', size='8,5')
 
 def submit():
     input = text_edit.toPlainText()
-    productions = Grammar.importGrammar(input)
+    grammar = Grammar.parse_input_grammar(input)
   
-    gnf = convertToGNF(productions)
+    gnf = convertToGNF(grammar)
+
+    
     print (gnf)
-    states, transitions = Grammar.generate_states_and_transitions(gnf)
-    pda = Automaton(states, transitions)
-    res = pda.toPda()
+    transitions = convert_to_PDA(gnf)
+    res = Grammar.build_PDA_output(transitions)
     print (res)
     show_pda(res=res)
 
-    res = generate_gnf_grammar(productions)
+    res = Grammar.build_gnf_grammar_output(grammar)
     show_gnf(gnf=res)
-    generate_graph(transitions=transitions)
-    draw()
-    grammar_status_label.setText("submitted")   
-
-
-
-def draw():
-    print (G)
-
+    graph, graph_list = Grammar.build_graph_output(G = G, transitions=transitions)
+    graph.view()
     plt.show()
-
+    grammar_status_label.setText("Status: submitted")   
 
 
 
@@ -46,34 +39,7 @@ def show_pda(res):
 def show_gnf(gnf):
     gnf_grammar.setPlainText(gnf)
 
-def generate_graph(transitions):
-    graph_list = dict()
-    G.node('Q0')
-    G.node('Q1')
-    G.node('Q2')
-    for transition in transitions:
 
-        src, dst = transition.currState.__str__(), transition.nextState.__str__()
-        print (src , "   ", dst)
-        G.edge(src, dst, label=transition.__str__())
-        #G.add_edge(src, dst, w=transition.__str__(),color = "black")
-        if (src,dst) not in graph_list:
-            graph_list[(src,dst)] = list()
-        graph_list[(src,dst)].append(transition.__str__())
-    
-    print(graph_list)
-    G.view()
-    
-    return graph_list
-
-
-# ###
-# key pair(q1, q2)
-# value = ["a,pop symbol -> push symbol", ....]
-# ###
-            
-
-        
 
 
 app = QApplication([])
@@ -109,14 +75,14 @@ labels_subgrid.addWidget(gnf_label)
 labels_subgrid.addWidget(pda_label)
 
 
-subgrid = QHBoxLayout()
-subgrid.addWidget(text_edit)
-subgrid.addWidget(gnf_grammar)
-subgrid.addWidget(pda_grammar)
+textboxes_subgrid = QHBoxLayout()
+textboxes_subgrid.addWidget(text_edit)
+textboxes_subgrid.addWidget(gnf_grammar)
+textboxes_subgrid.addWidget(pda_grammar)
 
 
 grid.addLayout(labels_subgrid)
-grid.addLayout((subgrid))
+grid.addLayout((textboxes_subgrid))
 grid.addWidget(grammar_status_label)
 
 grid.addWidget(submit_button)
@@ -124,15 +90,8 @@ grid.addWidget(submit_button)
 
 main_widget.setFixedSize(900, 500)
 
-main_widget.setWindowTitle('Lexer')
+main_widget.setWindowTitle('CFG to PDA')
 main_widget.setLayout(grid)
 main_widget.show()
 
 app.exec()
-
-
-# fig = plt.figure()
-# canvas = FigureCanvasTkAgg(fig, GraphInputPage)
-# canvas.draw()
-# canvas.get_tk_widget().pack(side=RIGHT, fill=Y)
-# GraphInputPage.mainloop()

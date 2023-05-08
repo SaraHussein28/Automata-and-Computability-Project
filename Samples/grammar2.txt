@@ -1,6 +1,0 @@
-S
-a,b
-S->aSA|aSC|b
-A->bB
-B->b
-C->aA
