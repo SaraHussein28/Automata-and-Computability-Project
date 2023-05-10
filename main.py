@@ -7,11 +7,11 @@ import graphviz
 from cfg_to_gnf import convertToGNF
 from gnf_to_pda import convert_to_PDA
 
-G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
-G.attr(rankdir='LR', size='8,5')
 
 
 def submit():
+    G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
+    G.attr(rankdir='LR', size='8,5')
     input = text_edit.toPlainText()
     grammar = Grammar.parse_input_grammar(input)
   
