@@ -21,10 +21,59 @@ A->bB
 B->b
 C->aA
 
+S
+a,b
+S -> aBB
+B -> aS|bS|a
 
-Check if this is CGF asasann:
+S
+a,b
+S -> aSb
+S -> a|b|λ
+---------------------------------------------------------- 
+WRONG output 
 
+Example 1:  S is deleted and and the program crashes 
+Check if this is CGF asasann: yes it is CFG -> check this link: https://www.javatpoint.com/automata-cfg-to-pda-conversion 
 S
 a,b
 S->aSb|A  
 A->bAa|S|λ
+
+after simplification (eliminating unit productions)
+S
+a,b
+S -> aSb|bSa|λ 
+
+after converting to GNF 
+S
+a,b
+S -> aSX|bSY|λ
+X -> b
+Y -> a
+
+--------------------------- 
+S 
+a
+S -> aS|λ
+
+---------------------------
+S 
+a,b
+S -> aABC 
+A -> aB|a 
+B -> bA|b 
+C -> a 
+---------------------------
+S 
+a,b
+S -> aTb|b
+T -> Ta|λ
+
+output:
+S
+a,b,λ,
+S -> aTB|b
+T -> λ|λZ
+B -> b
+Z -> a|aZ
