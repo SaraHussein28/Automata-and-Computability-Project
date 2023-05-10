@@ -20,12 +20,12 @@ def submit():
     
     print (gnf)
     transitions = convert_to_PDA(gnf)
-    res = Grammar.build_PDA_output(transitions)
-    print (res)
-    show_pda(res=res)
+    pda_res = Grammar.build_PDA_output(transitions)
+    print (pda_res)
+    show_pda(pda_res)
 
-    res = Grammar.build_gnf_grammar_output(grammar)
-    show_gnf(gnf=res)
+    gnf_res = Grammar.build_gnf_grammar_output(gnf)
+    show_gnf(gnf_res)
     graph, graph_list = Grammar.build_graph_output(G = G, transitions=transitions)
     graph.view()
     plt.show()

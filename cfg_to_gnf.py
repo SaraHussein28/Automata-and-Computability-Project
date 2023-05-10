@@ -2,40 +2,176 @@ import string
 import Utils.constants as constant
 
 
-def convertToGNF(productions):
+def convertToGNF(grammar):
     print ("Removing Lamda")
-    remove_lamda_productions(productions)
-    print (productions)
-
-    remove_empty_symbols_and_productions(grammar=productions)
-    print(productions)
+    grammar = remove_lamda_productions(grammar)
+    print (grammar)
 
     print("removing unit productions")
-    remove_unit_productions(productions)
-    print(productions)
+    remove_unit_productions(grammar)
+    print(grammar)
 
     print ("Removing Non accessible")
-    productions = remove_non_accessible(productions)
-    print(productions)
+    grammar = remove_non_accessible(grammar)
+    print(grammar)
 
     print ("Removing Non productive")
-    productions = removeNonProductive(productions)
-    print (productions)
+    grammar = removeNonProductive(grammar)
+    print (grammar)
 
-    normalizeToChomsky(productions)
-    normalizeToGreibach(productions)
+    normalizeToChomsky(grammar)
+    normalizeToGreibach(grammar)
 
     print ("Removing Non accessible")
-    productions = remove_non_accessible(productions)
-    print(productions)
+    grammar = remove_non_accessible(grammar)
+    print(grammar)
 
     print ("Removing Non productive")
-    productions = removeNonProductive(productions)
-    print (productions) 
+    grammar = removeNonProductive(grammar)
+    print (grammar) 
 
-    return productions   
+    return grammar   
 
+
+def make_permutations(rule, nonterm):
+    rule_lst = []
+    alredy_added = []
+    count = 0
+    new_set = set()
+
+    for letter in rule:
+        if letter != nonterm:
+            rule_lst.append(letter)
+        elif letter == nonterm:
+            rule_lst.append(letter)
+            count += 1
+    print(rule_lst)
+
+    if count == 1 and nonterm in rule_lst:
+        original = "".join(rule_lst)
+        making = [x for x in rule_lst if x != nonterm]
+        new = "".join(making)
+        alredy_added.append(new)
+        alredy_added.append(original)
+        if (original != ''):
+            new_set.add(original)
+        if (new != ''):
+            new_set.add(new)        
+        
+    print("here1 ", new_set)
+
+    if count == 0 and nonterm not in rule_lst:
+        making = [x for x in rule_lst if x != nonterm]
+        new = "".join(making)
+        alredy_added.append(new)
+        new_set.add(new)
+    print("here2 ", new_set)
+    if count == len(rule_lst):
+        new_set.add(constant.LAMBDA)
+        original = "".join(rule_lst)
+        alredy_added.append(original)
+        new_set.add(original)
+        print("here45 ", new_set)
+        for i in range(count):
+            new = i*nonterm
+            if new not in alredy_added:
+                alredy_added.append(new)
+                new_set.add(new)
+                print("here46 ", new_set)
+    print("here3 ", new_set)
+    if count > 1:
+
+        original = "".join(rule_lst)
+        alredy_added.append(original)
+        new_set.add(original)
+
+        without_nonterminals = "".join([x for x in rule_lst if x != nonterm])
+        alredy_added.append(without_nonterminals)
+        new_set.add(without_nonterminals)
+        print("here4 ", new_set)
+
+        index = 0
+        for i in rule_lst:
+            if i == nonterm:
+                before = "".join(rule_lst[:index])
+                if before == "":
+                    before = ''
+                after = "".join(rule_lst[index+1:])
+                new = before + after
+                if new not in alredy_added:
+                    alredy_added.append(new)
+                    new_set.add(new)
+                print("here5 ", new_set)
+                before = "".join([x for x in rule_lst[:index] if x != nonterm])
+                after = "".join(
+                    [x for x in rule_lst[index+1:] if x != nonterm])
+                
+                new = before + nonterm + after
+                if new not in alredy_added:
+                    alredy_added.append(new)
+                    new_set.add(new)
+                print("here6 ", new_set)
+                index += 1
+            if i != nonterm:
+                index += 1
+
+    return list(new_set)
+
+
+
+
+def remove_lamda_productions(grammar):
+    gram = copy_grammar(grammar)
+
+    keys = []
+    for key in gram:
+        keys.append(key)
+
+    for key in keys:
+        if constant.LAMBDA not in gram[key]:
+            continue
+        nonterm = key
+        for key in gram.keys():
+            for value in gram[key]:
+                if nonterm in value:
+                    new_value = make_permutations(value, nonterm)
+                    print(new_value)
+                    for i in new_value:
+                        if i not in gram[key]:
+                            gram[key].append(i)
+        print("print1 ", gram)
+        if constant.LAMBDA in gram[nonterm]:
+            print ("here")
+            gram[nonterm].remove(constant.LAMBDA)
     
+    print("print2 ",gram)
+    for key in gram:
+        for value in gram[key]:
+            if value ==  constant.LAMBDA:
+                if peek(key):
+                    print("heree")
+                    gram[key].remove(constant.LAMBDA)
+    print ("final print: ", gram )
+    return gram
+
+
+def peek(nonterminal):
+    xd = []
+    if nonterminal not in xd:
+        xd.append(nonterminal)
+        return True
+    return False
+
+
+def copy_grammar(grammar):
+    gramm = dict()
+    for nonterm, rule in grammar.items():
+        gramm[nonterm] = rule.copy()
+    return gramm
+
+
+
+
 def normalizeToGreibach(grammar):
 
     print("Transform indirect left recursion to direct left recursion")
@@ -336,38 +472,6 @@ def removeNonProductive(grammar):
 
 
 '''
-
-def remove_empty_symbols_and_productions(grammar):
-    deleted = True
-
-    while deleted:
-        deleted = False
-        toBePopped = []
-        for key in grammar:
-            if len(grammar[key]) == 0:
-                toBePopped.append(key)
-            for  i, production in enumerate(grammar[key]):
-                if len(production) == 0:
-                    grammar[key].remove(production)
-                    deleted = True
-                for char in production:
-                    if char.isupper() and char not in grammar:
-                        grammar[key][i] = production.replace(char,"")
-                        deleted = True
-                if len(grammar[key][i]) == 0:
-                    grammar[key].remove(grammar[key][i])
-        
-        for p in toBePopped:
-            grammar.pop(p)
-            deleted = True
-vis = set()
-
-def remove_lamda_productions(grammar):
-    for key in grammar:
-        for production in grammar[key]:
-            if production == constant.LAMBDA:
-                grammar[key].remove(production)
-
 
 if __name__ == "__main__":
     convertToGNF({

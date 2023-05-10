@@ -15,8 +15,6 @@ def build_graph_output(G, transitions):
             graph_list[(src,dst)] = list()
         graph_list[(src,dst)].append(transition.__str__())
     
-    print(graph_list)
-    
     
     return G, graph_list
 
