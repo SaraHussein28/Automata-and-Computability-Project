@@ -6,6 +6,7 @@ def build_graph_output(G, transitions):
     G.node('Q0')
     G.node('Q1')
     G.node('Q2')
+    G.attr(dpi = "400")
     for transition in transitions:
 
         src, dst = transition.currState.__str__(), transition.nextState.__str__()

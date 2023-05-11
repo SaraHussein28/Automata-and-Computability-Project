@@ -1,97 +1,46 @@
-from tkinter import *
-from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTextEdit, QWidget, QHBoxLayout, QVBoxLayout
-import IO as Grammar
-import matplotlib.pyplot as plt
-import graphviz
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QPushButton,
+    QWidget,
+    QVBoxLayout,
+)
+from NFA_to_DFA_GUI import NFA_To_DFA_Converter
+from CFG_to_PDA_GUI import CFG_To_PDA_Converter
 
-from cfg_to_gnf import convertToGNF
-from gnf_to_pda import convert_to_PDA
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
 
+        myQWidget = QWidget()
+        myBoxLayout = QVBoxLayout()     
 
+        nfaToDfa_btn = QPushButton("NFA to DFA")
+        nfaToDfa_btn.clicked.connect(self.open_NFA_To_DFA_Converter)
+        cfgToPda_btn = QPushButton("CFG to PDA")
+        cfgToPda_btn.clicked.connect(self.open_PDA)
+        myBoxLayout.addWidget(nfaToDfa_btn)     
+        myBoxLayout.addWidget(cfgToPda_btn)   
 
-def submit():
-    G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
-    G.attr(rankdir='LR', size='8,5')
-    input = text_edit.toPlainText()
-    grammar = Grammar.parse_input_grammar(input)
-  
-    gnf = convertToGNF(grammar)
+        myQWidget.setLayout(myBoxLayout)
+        self.setCentralWidget(myQWidget)
+        self.setWindowTitle('Main Window')
 
+    def open_NFA_To_DFA_Converter(self):
+        self.hide()
+        self.nfa_to_dfa_converter = NFA_To_DFA_Converter(self)
+        self.nfa_to_dfa_converter.show()
+        self.nfa_to_dfa_converter.center()
     
-    print (gnf)
-    transitions = convert_to_PDA(gnf)
-    pda_res = Grammar.build_PDA_output(transitions)
-    print (pda_res)
-    show_pda(pda_res)
-
-    gnf_res = Grammar.build_gnf_grammar_output(gnf)
-    show_gnf(gnf_res)
-    graph, graph_list = Grammar.build_graph_output(G = G, transitions=transitions)
-    graph.view()
-    plt.show()
-    grammar_status_label.setText("Status: submitted")   
-
-
-
-def show_pda(res):
-    pda_grammar.setPlainText(res)
-    
-def show_gnf(gnf):
-    gnf_grammar.setPlainText(gnf)
-
-
-
+    def open_PDA(self):
+        self.hide()
+        self.cfg_to_pda_converter = CFG_To_PDA_Converter(self)
+        self.cfg_to_pda_converter.show()
+        self.cfg_to_pda_converter.center()
 
 app = QApplication([])
-main_widget = QWidget()
-
-text_edit = QTextEdit()
-text_edit.setTabStopWidth(15)
-input_label = QLabel('Enter Context Free Grammar below!')
-
-grammar_status_label = QLabel("Status: Waiting...")
-submit_button = QPushButton('Submit')
-submit_button.clicked.connect(submit)
-
-
-gnf_grammar = QTextEdit()
-gnf_grammar.setTabStopWidth(15)
-gnf_grammar.setReadOnly(True)
-
-pda_grammar = QTextEdit()
-pda_grammar.setTabStopWidth(15)
-pda_grammar.setReadOnly(True)
-
-gnf_label = QLabel('GNF')
-pda_label = QLabel('PDA grammar')
-
-
-
-grid = QVBoxLayout()
-
-labels_subgrid = QHBoxLayout()
-labels_subgrid.addWidget(input_label)
-labels_subgrid.addWidget(gnf_label)
-labels_subgrid.addWidget(pda_label)
-
-
-textboxes_subgrid = QHBoxLayout()
-textboxes_subgrid.addWidget(text_edit)
-textboxes_subgrid.addWidget(gnf_grammar)
-textboxes_subgrid.addWidget(pda_grammar)
-
-
-grid.addLayout(labels_subgrid)
-grid.addLayout((textboxes_subgrid))
-grid.addWidget(grammar_status_label)
-
-grid.addWidget(submit_button)
-
-
-main_widget.setFixedSize(900, 500)
-
-main_widget.setWindowTitle('CFG to PDA')
-main_widget.setLayout(grid)
-main_widget.show()
-
-app.exec()
+mainWindow = MainWindow()
+mainWindow.setFixedSize(900,500)
+mainWindow.setWindowTitle('Automata Project')
+mainWindow.show()
+app.exec_()
