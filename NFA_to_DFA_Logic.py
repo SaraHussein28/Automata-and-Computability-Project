@@ -115,7 +115,7 @@ class Minimal_DFA(DFA):
         for state in partition[1:]:
             equivalent = False
             for sub_partition in sub_partitions:
-                state1 = next(iter(sub_partition)) #get an arbitrary set from the current sub_partition
+                state1 = next(iter(sub_partition)) #get an arbitrary state from the current sub_partition
                 equivalent = True
                 for character in self.alphabet:
                     state_transition_set = self.getTransitionSet(state=state, partitions=last_partitions, character=character)
@@ -194,6 +194,7 @@ class NFA(Finite_automata):
             if child["transition"] == EPSILON and visited[child["destination"]] == False:
                 temp = self.dfs(child["destination"], visited)
                 e_closure.update(temp)
+        print(f"{node} epsilon Closure: {e_closure}")
         return e_closure
 
     def computeEpsilonClosure(self):
