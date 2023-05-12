@@ -1,5 +1,6 @@
-
+import Utils.constants as constant
 from PyQt5 import QtCore
+
 from PyQt5.QtWidgets import (
     QDesktopWidget,
     QMainWindow,
@@ -33,47 +34,71 @@ class CFG_To_PDA_Converter(QMainWindow):
 
         self.plot_widget = FigureCanvasQTAgg(figure=self.fig)
 
-        self.text_edit = QTextEdit()
-        self.text_edit.setTabStopWidth(15)
-        self.input_label = QLabel('Enter Context Free Grammar below!')
 
-        self.grammar_status_label = QLabel("Status: Waiting...")
-        self.submit_button = QPushButton('Submit')
-        self.submit_button.clicked.connect(self.submit)
+        # input grammar subgrid
+
+        self.input_label = QLabel('Enter CFG below. \n1. Terminals and non terminals \ncan only have a length of 1'+
+                                  '\n2. Start symbol MUST be S'+
+                                  '\n3. Productions MUST be in format S->ab')
+        self.lamda_button = QPushButton('Insert lamda')
+        self.lamda_button.clicked.connect(self.insertLamda)
+
+        self.grammar_input = QTextEdit()
+        self.grammar_input.setTabStopWidth(15)
+
+        
+        self.input_grammar_subgrid = QVBoxLayout()
+
+        self.input_grammar_subgrid.addWidget(self.input_label)
+        self.input_grammar_subgrid.addWidget(self.lamda_button)
+        self.input_grammar_subgrid.addWidget(self.grammar_input)
 
 
+        #gnf grammar subgrid
         self.gnf_grammar = QTextEdit()
         self.gnf_grammar.setTabStopWidth(15)
         self.gnf_grammar.setReadOnly(True)
+        
+        self.gnf_label = QLabel('GNF Grammar')
+
+        self.gnf_grammar_subgrid = QVBoxLayout()
+
+
+        self.gnf_grammar_subgrid.addWidget(self.gnf_label)
+        self.gnf_grammar_subgrid.addWidget(self.gnf_grammar)
+
+
+        #pda grammar subgrid
+        self.pda_grammar_subgrid = QVBoxLayout()
 
         self.pda_grammar = QTextEdit()
         self.pda_grammar.setTabStopWidth(15)
         self.pda_grammar.setReadOnly(True)
 
-        self.gnf_label = QLabel('GNF')
         self.pda_label = QLabel('PDA grammar')
+
+        self.pda_grammar_subgrid.addWidget(self.pda_label)
+        self.pda_grammar_subgrid.addWidget(self.pda_grammar)
+
+
+        # adding all grammar layouts in one horizontal layout
+        self.grammars = QHBoxLayout()
+        self.grammars.addLayout(self.input_grammar_subgrid)
+        self.grammars.addLayout(self.gnf_grammar_subgrid)
+        self.grammars.addLayout(self.pda_grammar_subgrid)
+
+
+        self.submit_button = QPushButton('Submit')
+        self.submit_button.clicked.connect(self.submit)
 
 
 
         grid = QVBoxLayout()
 
-        labels_subgrid = QHBoxLayout()
-        labels_subgrid.addWidget(self.input_label)
-        labels_subgrid.addWidget(self.gnf_label)
-        labels_subgrid.addWidget(self.pda_label)
 
-
-        textboxes_subgrid = QHBoxLayout()
-        textboxes_subgrid.addWidget(self.text_edit)
-        textboxes_subgrid.addWidget(self.gnf_grammar)
-        textboxes_subgrid.addWidget(self.pda_grammar)
-
-
-        grid.addLayout(labels_subgrid)
-        grid.addLayout((textboxes_subgrid))
-        grid.addWidget(self.grammar_status_label)
-
+        grid.addLayout(self.grammars)
         grid.addWidget(self.submit_button)
+
 
 
         main_widget.setFixedSize(900, 500)
@@ -81,6 +106,10 @@ class CFG_To_PDA_Converter(QMainWindow):
         self.setCentralWidget(main_widget)
         self.setWindowTitle('CFG to PDA converter')
     
+    def insertLamda(self):
+        cursor = self.grammar_input.textCursor()
+        cursor.insertText(constant.LAMBDA)
+
     def show_pda(self, res):
         self.pda_grammar.setPlainText(res)
         
@@ -89,8 +118,8 @@ class CFG_To_PDA_Converter(QMainWindow):
 
     def submit(self):
         G = graphviz.Digraph('finite_state_machine', comment='The Round Table')
-        G.attr(rankdir='LR', size='8,5')
-        input = self.text_edit.toPlainText()
+        G.attr(rankdir='LR')
+        input = self.grammar_input.toPlainText()
         grammar = Grammar.parse_input_grammar(input)
     
         gnf = convertToGNF(grammar)
@@ -110,8 +139,6 @@ class CFG_To_PDA_Converter(QMainWindow):
         self.pda_plot = Matplotlib_Popup_Window(parent = self, img=img, title='PDA')
         self.pda_plot.show()
         self.pda_plot.center()
-        
-        self.grammar_status_label.setText("Status: submitted")
 
     def center(self):
         qr = self.frameGeometry()

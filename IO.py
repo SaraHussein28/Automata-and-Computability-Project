@@ -1,4 +1,4 @@
-from Utils.Exceptions import IllegalVariableException
+
 import Utils.constants as constant
 
 def build_graph_output(G, transitions):
@@ -10,7 +10,6 @@ def build_graph_output(G, transitions):
     for transition in transitions:
 
         src, dst = transition.currState.__str__(), transition.nextState.__str__()
-        print (src , "   ", dst)
         G.edge(src, dst, label=transition.__str__())
         if (src,dst) not in graph_list:
             graph_list[(src,dst)] = list()
@@ -52,21 +51,16 @@ def parse_input_grammar (input):
     data = input.splitlines()
 
 
-    terminals = data[1].rstrip()
+    # terminals = data[1].rstrip()
     
     
-    terminals = terminals.split(',')
+    # terminals = terminals.split(',')
     grammar = {}
     
-    for idx in range(2, data.__len__()):
+    for idx in range(0, data.__len__()):
         rule = data[idx].strip()
         rule = rule.replace(" ", "")
-        for character in rule:
-            if character == '-' or character == '>' or character == '|':
-                pass
-            elif character not in terminals and (not character.isupper()) and character != constant.LAMBDA:
-                raise IllegalVariableException(character, rule)
-        
+
         #left hand side: state
         lhs = rule[:rule.find('-')]
         if lhs not in grammar:
@@ -81,8 +75,11 @@ def parse_input_grammar (input):
         #assign productions to each state
         for t in rhs:
             grammar[lhs].append(t)
-
-
+    
+    for key in grammar:
+        for i, production in enumerate(grammar[key]):
+            if constant.LAMBDA in production and len(production) > 1:
+                grammar[key][i] = production.replace(constant.LAMBDA, '')
     return grammar
 
 

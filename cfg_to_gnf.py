@@ -1,175 +1,25 @@
 import string
 import Utils.constants as constant
+import simplify_cfg
 
 
 def convertToGNF(grammar):
-    print ("Removing Lamda")
-    grammar = remove_lamda_productions(grammar)
-    print (grammar)
 
-    print("removing unit productions")
-    remove_unit_productions(grammar)
-    print(grammar)
-
-    print ("Removing Non accessible")
-    grammar = remove_non_accessible(grammar)
-    print(grammar)
-
-    print ("Removing Non productive")
-    grammar = removeNonProductive(grammar)
-    print (grammar)
+    simplify_cfg.simplify_grammar(grammar=grammar)
+    print("Simplified Grammar: \n", grammar)
 
     normalizeToChomsky(grammar)
     normalizeToGreibach(grammar)
 
     print ("Removing Non accessible")
-    grammar = remove_non_accessible(grammar)
+    grammar = simplify_cfg.remove_non_accessible(grammar)
     print(grammar)
 
     print ("Removing Non productive")
-    grammar = removeNonProductive(grammar)
+    grammar = simplify_cfg.remove_non_productive(grammar)
     print (grammar) 
 
     return grammar   
-
-
-def make_permutations(rule, nonterm):
-    rule_lst = []
-    alredy_added = []
-    count = 0
-    new_set = set()
-
-    for letter in rule:
-        if letter != nonterm:
-            rule_lst.append(letter)
-        elif letter == nonterm:
-            rule_lst.append(letter)
-            count += 1
-    print(rule_lst)
-
-    if count == 1 and nonterm in rule_lst:
-        original = "".join(rule_lst)
-        making = [x for x in rule_lst if x != nonterm]
-        new = "".join(making)
-        alredy_added.append(new)
-        alredy_added.append(original)
-        if (original != ''):
-            new_set.add(original)
-        if (new != ''):
-            new_set.add(new)        
-        
-    print("here1 ", new_set)
-
-    if count == 0 and nonterm not in rule_lst:
-        making = [x for x in rule_lst if x != nonterm]
-        new = "".join(making)
-        alredy_added.append(new)
-        new_set.add(new)
-    print("here2 ", new_set)
-    if count == len(rule_lst):
-        new_set.add(constant.LAMBDA)
-        original = "".join(rule_lst)
-        alredy_added.append(original)
-        new_set.add(original)
-        print("here45 ", new_set)
-        for i in range(count):
-            new = i*nonterm
-            if new not in alredy_added:
-                alredy_added.append(new)
-                new_set.add(new)
-                print("here46 ", new_set)
-    print("here3 ", new_set)
-    if count > 1:
-
-        original = "".join(rule_lst)
-        alredy_added.append(original)
-        new_set.add(original)
-
-        without_nonterminals = "".join([x for x in rule_lst if x != nonterm])
-        alredy_added.append(without_nonterminals)
-        new_set.add(without_nonterminals)
-        print("here4 ", new_set)
-
-        index = 0
-        for i in rule_lst:
-            if i == nonterm:
-                before = "".join(rule_lst[:index])
-                if before == "":
-                    before = ''
-                after = "".join(rule_lst[index+1:])
-                new = before + after
-                if new not in alredy_added:
-                    alredy_added.append(new)
-                    new_set.add(new)
-                print("here5 ", new_set)
-                before = "".join([x for x in rule_lst[:index] if x != nonterm])
-                after = "".join(
-                    [x for x in rule_lst[index+1:] if x != nonterm])
-                
-                new = before + nonterm + after
-                if new not in alredy_added:
-                    alredy_added.append(new)
-                    new_set.add(new)
-                print("here6 ", new_set)
-                index += 1
-            if i != nonterm:
-                index += 1
-
-    return list(new_set)
-
-
-
-
-def remove_lamda_productions(grammar):
-    gram = copy_grammar(grammar)
-
-    keys = []
-    for key in gram:
-        keys.append(key)
-
-    for key in keys:
-        if constant.LAMBDA not in gram[key]:
-            continue
-        nonterm = key
-        for key in gram.keys():
-            for value in gram[key]:
-                if nonterm in value:
-                    new_value = make_permutations(value, nonterm)
-                    print(new_value)
-                    for i in new_value:
-                        if i not in gram[key]:
-                            gram[key].append(i)
-        print("print1 ", gram)
-        if constant.LAMBDA in gram[nonterm]:
-            print ("here")
-            gram[nonterm].remove(constant.LAMBDA)
-    
-    print("print2 ",gram)
-    for key in gram:
-        for value in gram[key]:
-            if value ==  constant.LAMBDA:
-                if peek(key):
-                    print("heree")
-                    gram[key].remove(constant.LAMBDA)
-    print ("final print: ", gram )
-    return gram
-
-
-def peek(nonterminal):
-    xd = []
-    if nonterminal not in xd:
-        xd.append(nonterminal)
-        return True
-    return False
-
-
-def copy_grammar(grammar):
-    gramm = dict()
-    for nonterm, rule in grammar.items():
-        gramm[nonterm] = rule.copy()
-    return gramm
-
-
 
 
 def normalizeToGreibach(grammar):
@@ -212,9 +62,6 @@ def checkProductionHead(grammar, key, head, prevkey):
             temp = checkProductionHead(grammar, key, production[0], head)
             if temp:
                 return temp
-
-
-
 
 
 def checkForIndirectLeftRecursion(grammar):
@@ -282,8 +129,6 @@ def replaceNTtoT(grammar):
         print(grammar)
 
 
-
-
 def normalizeToChomsky(grammar):
     dictionaryOfReplaces = dict()
     alphabet = list(set(string.ascii_uppercase) - set(grammar.keys()))
@@ -298,15 +143,6 @@ def normalizeToChomsky(grammar):
     grammar.update(newDict)
 
     print (grammar)
-'''
-        "S" : ["aaB", "abAF", "aaSE", "F"],
-        "A" : ["aA"],
-        "B" :["ab", "b", "E"],
-        "C": ["aD"],
-        "D" : ["abE", "F"],
-        "E" : ["λ", "ab"],
-        "F": ["λ"]
-'''
 
 def replaceTerminals(grammar, dictionaryOfReplaces, alphabet):
     for key in grammar:
@@ -352,180 +188,3 @@ def divideNonTerminals(grammar, dictionaryOfReplaces, alphabet):
             else:
                 newList.append(divideProduction(grammar, production, dictionaryOfReplaces, alphabet))
         grammar[key] = newList
-
-
-
-def remove_unit_productions(grammar):
-    unitProductions = getUnitProductions(grammar)
-    print("Unit Productions = ", unitProductions)
-    for key in unitProductions:
-        for production in unitProductions[key]:
-            grammar[key].extend(set(grammar[production]) - set(grammar[key]))
-
-# S -> Aa | B
-# A -> b | B
-# B -> A | a
-visUnit = set()
-def checkForMultipleUnitProductions(unitProductions, key):
-    if not unitProductions[key][0] in unitProductions or key in visUnit:
-        return unitProductions[key][0]
-    visUnit.add(key)
-    return checkForMultipleUnitProductions(unitProductions, unitProductions[key][0])
-
-def getUnitProductions(grammar):
-    unitProductions = {}
-    for key in grammar:
-        temp = []
-        for production in grammar[key]:
-            if len(production) == 1 and production.isupper():
-                temp.append(production)
-        if temp:
-            unitProductions[key] = temp
-
-    for key in unitProductions:
-        temp = checkForMultipleUnitProductions(unitProductions, key)
-        if temp and temp != key and temp not in unitProductions[key]:
-            unitProductions[key].extend(temp)
-
-    # remove unit productions
-    for key in unitProductions:
-        for production in unitProductions[key]:
-            if grammar[key].__contains__(production):
-                grammar[key].remove(production)
-
-
-    return unitProductions
-
-def checkAccesible(productions, start, accessible):
-    if start != "S":
-        if start in accessible:
-            return
-        elif start not in accessible:
-            accessible.extend(start)
-
-    for production in productions[start]:
-        for char in production:
-            if char.isupper() and char != start and char not in accessible:
-                accessible = checkAccesible(productions, char, accessible)
-
-    return accessible
-
-def remove_non_accessible(productions):
-    accesible = ["S"]
-    accesible = checkAccesible(productions, "S", accesible)
-    
-    nonTerminals = set(productions.keys())
-    nonAccesible = set(nonTerminals) - set(accesible)
-    print("Non Accesible = ", nonAccesible)
-    for key in nonAccesible:
-        productions.pop(key)
-    
-    return productions
-
-def getNonProductiveSymbols(grammar):
-    nonTerminals = set(grammar.keys())
-    productiveSymbols = set()
-    for key in grammar:
-        if any(production.islower() for production in grammar[key]):
-            productiveSymbols.add(key)
-
-    # if a NonTerminal has as productions 2 NonTerminals that can be productive or not productive
-    temp = nonTerminals.difference(productiveSymbols)
-    temp2 = {""}
-    for key in grammar:
-        for production in grammar[key]:
-            for productive in productiveSymbols:
-                if production.__contains__(productive):
-                    for nonProductive in temp:
-                        if not production.__contains__(nonProductive):
-                            temp2.add(key)
-
-    productiveSymbols |= (temp2)
-
-    return list(nonTerminals.difference(productiveSymbols))
-
-def removeNonProductive(grammar):
-    nonProductiveSymbols = getNonProductiveSymbols(grammar)
-    print("Non Productive Set = ", nonProductiveSymbols)
-    if not nonProductiveSymbols:
-        return grammar
-    for key in grammar:
-        for production in grammar[key]:
-            for nonProductive in nonProductiveSymbols:
-                if production.__contains__(nonProductive):
-                    grammar[key].remove(production)
-    
-    for symbol in nonProductiveSymbols:
-        grammar.pop(symbol)
-
-    return grammar
-
-'''
-        "S" : ["aaB", "abA", "aaSE", "X"],
-        "A" : ["aA"],
-        "B" :["ab", "b", "E"],
-        "C": ["aD"],
-        "D" : ["abE"],
-        "E" : [ "ab"]
-
-        X : []
-
-
-'''
-
-if __name__ == "__main__":
-    convertToGNF({
-        "S" : ["abS", "abA", "abB"],
-        "A" : ["cd", "λ"],
-        "B" :["aB"],
-        "C": ["dc"], 
-    })
-
-    print("------------------------")
-    convertToGNF({
-        "S" : ["aaB", "abAF", "aaSE", "F"],
-        "A" : ["aA"],
-        "B" :["ab", "b", "E"],
-        "C": ["aD"],
-        "D" : ["abE", "F"],
-        "E" : ["λ", "ab"],
-        "F": ["λ"]
-    })
-
-    print("------------------------")
-    convertToGNF({
-        "S" : ["aaB", "abAF", "aaSE", "F", "X"],
-        "A" : ["aA"],
-        "B" :["ab", "b", "E"],
-        "C": ["aD"],
-        "D" : ["abE", "F"],
-        "E" : ["λ", "ab"],
-        "F": ["λ"],
-        "X":["F"]
-    })    
-    print("---------------------")
-    convertToGNF({
-        "S" : ["Aa", "B"],
-        "A" : ["b", "B"],
-        "B" :["A", "a"]
-    })
-    print("---------------------")
-    convertToGNF({
-        "S" : ["XA", "BB"],
-        "A" : ["a"],
-        "B" :["b", "SB"],
-        "X":["b"]
-    })  
-    print("---------------------")
-    convertToGNF({
-        "S" : ["aSbb", "a"]
-    })  
-# S → XA|BB 
-# B → b|SB 
-# X → b 
-# A → a
-    
-
-# S -> Aa | B
-# A -> b | B
-# B -> A | a
