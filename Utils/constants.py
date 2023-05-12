@@ -1,3 +1,4 @@
 LAMBDA = "λ"
-EPSILON = "ε"
+EMPTY_STACK = "$"
 DELTA = "𝛿"
+EPSILON = "ε"
