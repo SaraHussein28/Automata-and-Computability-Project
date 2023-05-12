@@ -24,6 +24,6 @@ def convert_to_PDA(grammar):
     init = Transition(constant.LAMBDA, initState, midState, constant.EMPTY_STACK, ["S", constant.EMPTY_STACK])    
     transitions.append(init)
     # final state transition upon encountering epsilon
-    final = Transition(constant.LAMBDA, midState, finalState, constant.EMPTY_STACK, [constant.LAMBDA])
+    final = Transition(constant.LAMBDA, midState, finalState, constant.EMPTY_STACK, [constant.EMPTY_STACK])
     transitions.append(final)
     return transitions
