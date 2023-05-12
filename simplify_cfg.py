@@ -50,7 +50,7 @@ def make_permutations(rule, nonterm):
         alredy_added.append(new)
         new_set.add(new)
     if count == len(rule_lst):
-        new_set.add(constant.LAMBDA)
+        new_set.add(constant.EPSILON)
         original = "".join(rule_lst)
         alredy_added.append(original)
         new_set.add(original)
@@ -105,7 +105,7 @@ def remove_lamda_productions(grammar):
         keys.append(key)
 
     for key in keys:
-        if constant.LAMBDA not in gram[key]:
+        if constant.EPSILON not in gram[key]:
             continue
         nonterm = key
         for key in gram.keys():
@@ -115,13 +115,13 @@ def remove_lamda_productions(grammar):
                     for i in new_value:
                         if i not in gram[key]:
                             gram[key].append(i)
-        if constant.LAMBDA in gram[nonterm]:
-            gram[nonterm].remove(constant.LAMBDA)
+        if constant.EPSILON in gram[nonterm]:
+            gram[nonterm].remove(constant.EPSILON)
     
     for key in gram:
         for value in gram[key]:
-            if value ==  constant.LAMBDA:
-                gram[key].remove(constant.LAMBDA)
+            if value ==  constant.EPSILON:
+                gram[key].remove(constant.EPSILON)
     return gram
 
 

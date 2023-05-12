@@ -78,8 +78,8 @@ def parse_input_grammar (input):
     
     for key in grammar:
         for i, production in enumerate(grammar[key]):
-            if constant.LAMBDA in production and len(production) > 1:
-                grammar[key][i] = production.replace(constant.LAMBDA, '')
+            if constant.EPSILON in production and len(production) > 1:
+                grammar[key][i] = production.replace(constant.EPSILON, '')
     return grammar
 
 

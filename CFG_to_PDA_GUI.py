@@ -40,8 +40,8 @@ class CFG_To_PDA_Converter(QMainWindow):
         self.input_label = QLabel('Enter CFG below. \n1. Terminals and non terminals \ncan only have a length of 1'+
                                   '\n2. Start symbol MUST be S'+
                                   '\n3. Productions MUST be in format S->ab')
-        self.lamda_button = QPushButton('Insert lamda')
-        self.lamda_button.clicked.connect(self.insertLamda)
+        self.epsilon_button = QPushButton('Insert epsilon')
+        self.epsilon_button.clicked.connect(self.insertEpsilon)
 
         self.grammar_input = QTextEdit()
         self.grammar_input.setTabStopWidth(15)
@@ -50,7 +50,7 @@ class CFG_To_PDA_Converter(QMainWindow):
         self.input_grammar_subgrid = QVBoxLayout()
 
         self.input_grammar_subgrid.addWidget(self.input_label)
-        self.input_grammar_subgrid.addWidget(self.lamda_button)
+        self.input_grammar_subgrid.addWidget(self.epsilon_button)
         self.input_grammar_subgrid.addWidget(self.grammar_input)
 
 
@@ -106,9 +106,9 @@ class CFG_To_PDA_Converter(QMainWindow):
         self.setCentralWidget(main_widget)
         self.setWindowTitle('CFG to PDA converter')
     
-    def insertLamda(self):
+    def insertEpsilon(self):
         cursor = self.grammar_input.textCursor()
-        cursor.insertText(constant.LAMBDA)
+        cursor.insertText(constant.EPSILON)
 
     def show_pda(self, res):
         self.pda_grammar.setPlainText(res)

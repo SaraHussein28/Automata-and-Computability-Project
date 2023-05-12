@@ -16,14 +16,14 @@ def convert_to_PDA(grammar):
                 midState,
                 key, #pop rule symbol on transition ---> lhs = key
                 # bn consume awel char (elly howa dayman terminal because GNF) and push elly b3d el terminal dah
-                list(production[1:]) if len(list(production[1:])) > 0 else [constant.LAMBDA]
+                list(production[1:]) if len(list(production[1:])) > 0 else [constant.EPSILON]
             )
             transitions.append(trans)
     
         # initial state & transition
-    init = Transition(constant.LAMBDA, initState, midState, constant.EMPTY_STACK, ["S", constant.EMPTY_STACK])    
+    init = Transition(constant.EPSILON, initState, midState, constant.EMPTY_STACK, ["S", constant.EMPTY_STACK])    
     transitions.append(init)
     # final state transition upon encountering epsilon
-    final = Transition(constant.LAMBDA, midState, finalState, constant.EMPTY_STACK, [constant.EMPTY_STACK])
+    final = Transition(constant.EPSILON, midState, finalState, constant.EMPTY_STACK, [constant.EPSILON])
     transitions.append(final)
     return transitions
