@@ -20,7 +20,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import io
 
-from NFA_to_DFA_Logic import NFA, DFA, Finite_automata
+from NFA_to_DFA_Logic import NFA, DFA, Finite_automata, Minimal_DFA
 
 class NFA_To_DFA_Converter(QMainWindow):
     def __init__(self, parent):
@@ -44,6 +44,13 @@ class NFA_To_DFA_Converter(QMainWindow):
         self.dfa_plot_widget = FigureCanvasQTAgg(figure=self.dfa_figure)
         dfa_plot_layout = QHBoxLayout()
         dfa_plot_layout.addWidget(self.dfa_plot_widget)
+
+        self.minimal_dfa_figure = Figure()
+        self.minimal_dfa_plot = self.minimal_dfa_figure.add_subplot(111)
+        self.minimal_dfa_plot.axis('off')
+        self.minimal_dfa_plot_widget = FigureCanvasQTAgg(figure=self.minimal_dfa_figure)
+        minimal_dfa_plot_layout = QHBoxLayout()
+        minimal_dfa_plot_layout.addWidget(self.minimal_dfa_plot_widget)
 
         self.nfa = NFA()
 
@@ -110,10 +117,13 @@ class NFA_To_DFA_Converter(QMainWindow):
         plots_layout = QVBoxLayout()
         nfa_groupBox = QGroupBox('NFA')
         dfa_groupBox = QGroupBox('DFA')
+        minimal_dfa_groupBox = QGroupBox('Minimal DFA')
         nfa_groupBox.setLayout(nfa_plot_layout)
         dfa_groupBox.setLayout(dfa_plot_layout)
+        minimal_dfa_groupBox.setLayout(minimal_dfa_plot_layout)
         plots_layout.addWidget(nfa_groupBox)
         plots_layout.addWidget(dfa_groupBox)
+        plots_layout.addWidget(minimal_dfa_groupBox)
 
         grid = QHBoxLayout()
         grid.addLayout(controls_layout)
@@ -136,6 +146,10 @@ class NFA_To_DFA_Converter(QMainWindow):
     def update_DFA_plot(self, dfa: DFA):
         self.update_plot(automata=dfa, plot=self.dfa_plot)
         self.dfa_plot_widget.draw()
+
+    def update_minimal_DFA_plot(self, dfa: Minimal_DFA):
+        self.update_plot(automata=dfa, plot=self.minimal_dfa_plot)
+        self.minimal_dfa_plot_widget.draw()
 
     def update_NFA_plot(self):
         self.update_plot(automata=self.nfa, plot=self.nfa_plot)
@@ -196,15 +210,20 @@ class NFA_To_DFA_Converter(QMainWindow):
     def convert_to_dfa(self):
         dfa = self.nfa.generateDFA()
         self.update_DFA_plot(dfa=dfa)
+        minimal_dfa = Minimal_DFA(dfa = dfa)
+        self.update_minimal_DFA_plot(dfa = minimal_dfa)
 
     def clear_automata(self):
         self.nfa = NFA()
         dfa = DFA()
+        minimal_dfa = Minimal_DFA(dfa=dfa)
         self.update_NFA_plot()
         self.update_DFA_plot(dfa = dfa)
+        self.update_minimal_DFA_plot(dfa=minimal_dfa)
         self.update_comboboxes()
         self.num_states = 0
         self.stateName_txtBox.setText(f'q{self.num_states}')
+        self.transitionCondition_txtBox.setText('')
         self.disable_buttons()
 
     def disable_buttons(self):

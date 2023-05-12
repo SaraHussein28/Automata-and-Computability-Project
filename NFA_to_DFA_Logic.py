@@ -1,5 +1,6 @@
 from collections import defaultdict
 import graphviz
+from itertools import combinations
 from Utils.constants import EPSILON
 
 class Finite_automata():
@@ -40,13 +41,6 @@ class DFA(Finite_automata):
     
     def has_state(self, state):
         return self.automata.get(state)
-    
-    def minimize(self):
-        pass
-
-    def check(self, input_string):
-        #should return true if the input string is accepted and false otherwise
-        pass
 
     def get_Graph(self):
         G = graphviz.Digraph()
@@ -76,6 +70,114 @@ class DFA(Finite_automata):
         
         return G
 
+class Minimal_DFA(DFA):
+    def __init__(self, dfa :DFA) -> None:
+        self.automata = dfa.automata
+        self.alphabet = dfa.alphabet
+        self.final_states = dfa.final_states
+        self.start_state = dfa.start_state
+        self.transition_table = self.generateTransitionTable()
+        self.minimize()
+    
+    def generateTransitionTable(self):
+        transitionTable = {}
+        for state,transitions in self.automata.items():
+            transitionTable[state] = {character: None for character in sorted(self.alphabet)}
+            for transition in transitions:
+                destNode = transition["destination"]
+                transition_condition = transition["transition"]
+                transitionTable[state][transition_condition] = destNode
+        print("Transition Table: ",transitionTable,'\n\n')
+        return transitionTable
+    
+    def getInitialPartitions(self):
+        non_final_states = set(list(self.automata.keys()))
+        final_states = set(map(tuple,self.final_states))
+        non_final_states.difference_update(final_states)
+        partition = set([frozenset(non_final_states),frozenset(final_states)])
+        return partition
+    
+    def getTransitionSet(self, state, partitions, character):
+        transition_state = self.transition_table[state][character]
+        if transition_state == None:
+            return None
+        for set in partitions:
+            if tuple(transition_state) in set:
+                return set
+
+    def divide(self, partition, last_partitions):
+        partition = list(partition)
+        if len(partition) == 0:
+            return [set()]
+        tempset=set()
+        tempset.add(partition[0])
+        sub_partitions = [tempset]
+        for state in partition[1:]:
+            equivalent = False
+            for sub_partition in sub_partitions:
+                state1 = next(iter(sub_partition)) #get an arbitrary set from the current sub_partition
+                equivalent = True
+                for character in self.alphabet:
+                    state_transition_set = self.getTransitionSet(state=state, partitions=last_partitions, character=character)
+                    state1_transition_set = self.getTransitionSet(state=state1, partitions=last_partitions, character=character)
+                    if state_transition_set != state1_transition_set:
+                        equivalent = False
+                        break
+                if equivalent:
+                    sub_partition.add(tuple(state))
+                    break
+            if equivalent == False:
+                sub_partitions.append(set([tuple(state)]))
+        return sub_partitions
+    
+    def getNextPartitions(self, partitions):
+        next_partitions = []
+        for partition in partitions:
+            temp = self.divide(partition=partition, last_partitions = partitions)
+            next_partitions.extend(temp)
+        return set({frozenset(set) for set in next_partitions})
+    
+    def generateStateFromPartition(self, partition):
+        state = []
+        for sub_state in partition:
+            state.extend(sub_state)
+        state = list(set(state))
+        state.sort()
+        return tuple(state)
+
+    def updateAutomata(self, partitions):
+        self.automata.clear()
+        for partition in partitions:
+            if len(partition)==0:
+                continue
+            src_state = self.generateStateFromPartition(partition=partition)
+            self.add_state(state_name=src_state)
+            for state in partition:
+                if list(state) == self.start_state:
+                    self.set_start_state(state=list(src_state))
+                if state in self.final_states:
+                    self.add_final_state(state=src_state)
+
+            selected_state = list(partition)[0] #select an arbitrary state from the partition
+            for character in self.alphabet:
+                dest_set = self.getTransitionSet(state=selected_state, partitions=partitions, character=character)
+                if dest_set:
+                    dest_state = self.generateStateFromPartition(partition=dest_set)
+                    self.add_transition(src_state=src_state, dest_state=dest_state, condition=character)
+
+        print("minimized automata:", self.automata)
+
+
+    def minimize(self):
+        prev_partitions = self.getInitialPartitions()
+        print("initial partitions:", prev_partitions)
+        while True:
+            next_partitions = self.getNextPartitions(partitions = prev_partitions)
+            if next_partitions == prev_partitions:
+                print("Final partitions:", prev_partitions)
+                break
+            prev_partitions = next_partitions
+        self.updateAutomata(partitions=prev_partitions)
 
 class NFA(Finite_automata):
     epsilon_closure = None
@@ -116,11 +218,12 @@ class NFA(Finite_automata):
             if dfa.has_state(state=tuple(state)):
                 continue
             dfa.add_state(tuple(state))
+            for sub_state in state:
+                if sub_state in self.final_states and state not in dfa.final_states:
+                    dfa.final_states.append(state)
             for transition in self.alphabet:
                 temp = []
                 for sub_state in state:
-                    if sub_state in self.final_states and state not in dfa.final_states:
-                        dfa.final_states.append(state)
                     for child in self.automata[sub_state]:
                         if(child["transition"] !=  transition):
                             continue
