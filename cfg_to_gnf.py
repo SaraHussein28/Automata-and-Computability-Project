@@ -5,7 +5,7 @@ import simplify_cfg
 
 def convertToGNF(grammar):
 
-    simplify_cfg.simplify_grammar(grammar=grammar)
+    grammar = simplify_cfg.simplify_grammar(grammar=grammar)
     print("Simplified Grammar: \n", grammar)
 
     normalizeToChomsky(grammar)

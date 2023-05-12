@@ -18,6 +18,8 @@ def simplify_grammar(grammar):
     grammar = remove_non_productive(grammar)
     print (grammar)
 
+    return grammar
+
 
 def make_permutations(rule, nonterm):
     rule_lst = []
