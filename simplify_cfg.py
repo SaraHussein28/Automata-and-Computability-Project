@@ -2,8 +2,8 @@
 import Utils.constants as constant
 
 def simplify_grammar(grammar):
-    print ("Removing Lamda")
-    grammar = remove_lamda_productions(grammar)
+    print ("Removing epsilon")
+    grammar = remove_epsilon_productions(grammar)
     print (grammar)
 
     print("removing unit productions")
@@ -99,39 +99,33 @@ def make_permutations(rule, nonterm):
 
 
 
-def remove_lamda_productions(grammar):
-    gram = copy_grammar(grammar)
+def remove_epsilon_productions(grammar):
+
 
     keys = []
-    for key in gram:
+    for key in grammar:
         keys.append(key)
 
     for key in keys:
-        if constant.EPSILON not in gram[key]:
+        if constant.EPSILON not in grammar[key]:
             continue
         nonterm = key
-        for key in gram.keys():
-            for value in gram[key]:
+        for key in grammar.keys():
+            for value in grammar[key]:
                 if nonterm in value:
                     new_value = make_permutations(value, nonterm)
                     for i in new_value:
-                        if i not in gram[key]:
-                            gram[key].append(i)
-        if constant.EPSILON in gram[nonterm]:
-            gram[nonterm].remove(constant.EPSILON)
+                        if i not in grammar[key]:
+                            grammar[key].append(i)
+        if constant.EPSILON in grammar[nonterm]:
+            grammar[nonterm].remove(constant.EPSILON)
     
-    for key in gram:
-        for value in gram[key]:
+    for key in grammar:
+        for value in grammar[key]:
             if value ==  constant.EPSILON:
-                gram[key].remove(constant.EPSILON)
-    return gram
+                grammar[key].remove(constant.EPSILON)
+    return grammar
 
-
-def copy_grammar(grammar):
-    grammar_copy = dict()
-    for key, production in grammar.items():
-        grammar_copy[key] = production.copy()
-    return grammar_copy
 
 
 

@@ -1,70 +1,56 @@
-S
-a,b
+
 S->aSX|bSY|b
 X->b
 Y->a
 ------------------
-S
-a,b
+
 S->aSbb|a
 ------------------
-S
-a,b,c
+
 S -> aA
 A -> aABc|BB|a
 B -> b
 ------------------
-S
-a,b
+
 S->aSA|aSC|b
 A->bB
 B->b
 C->aA
 ------------------
-S
-a,b
+
 S -> aBB
 B -> aS|bS|a
 ------------------
-S
-a,b
+
 S -> aSb
 S -> a|b|ε
 ------------------
-S
-a,b
+
 S->aSb|A
 A->bAa|S|ε
 ------------------
-S
-a,b
+
 S -> aSb|bSa|ε 
 ------------------
-S
-a,b
+
 S -> aSX|bSY|ε
 X -> b
 Y -> a
 ------------------
-S 
-a
+
 S -> aS|ε
 ------------------
-S 
-a,b
+
 S -> aABC 
 A -> aB|a 
 B -> bA|b 
 C -> a 
 ------------------
-S 
-a,b
+
 S -> aTb|b
 T -> Ta|ε
 ------------------
-S
-a,b,ε,
-S -> aTB|b
-T -> ε|εZ
-B -> b
-Z -> a|aZ
+S -> ABAC
+A -> aA |ε
+B -> bB | ε
+C ->c
