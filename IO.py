@@ -90,26 +90,30 @@ def build_gnf_grammar_output(grammar):
     res = ""
     terminals = ""
     transtions = ""
-    first = True
+    firstProduction = True
+    firstTerminal = True
 
     for key in grammar:
         for production in grammar[key]:
             
             for pr in production:
                 if pr.islower() and pr not in terminals:
-                    terminals+=pr + ','
+                    if firstTerminal == False: 
+                        terminals+=','
+                    terminals+=pr
+                    firstTerminal = False
 
     res = 'S' +'\n' + terminals +'\n'
     
     for key in grammar:
         for production in grammar[key]:
             
-            if not first:
+            if not firstProduction:
                 transtions+= '|' + production
             else:
                 transtions+= key + ' -> ' + production
-                first = False
-        first = True
+                firstProduction = False
+        firstProduction = True
 
 
         transtions +='\n'
