@@ -29,26 +29,26 @@ B -> aS|bS|a
 S
 a,b
 S -> aSb
-S -> a|b|λ
+S -> a|b|ε
 ------------------
 S
 a,b
-S->aSb|A  
-A->bAa|S|λ
+S->aSb|A
+A->bAa|S|ε
 ------------------
 S
 a,b
-S -> aSb|bSa|λ 
+S -> aSb|bSa|ε 
 ------------------
 S
 a,b
-S -> aSX|bSY|λ
+S -> aSX|bSY|ε
 X -> b
 Y -> a
 ------------------
 S 
 a
-S -> aS|λ
+S -> aS|ε
 ------------------
 S 
 a,b
@@ -60,11 +60,11 @@ C -> a
 S 
 a,b
 S -> aTb|b
-T -> Ta|λ
+T -> Ta|ε
 ------------------
 S
-a,b,λ,
+a,b,ε,
 S -> aTB|b
-T -> λ|λZ
+T -> ε|εZ
 B -> b
 Z -> a|aZ
